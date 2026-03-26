@@ -1,77 +1,245 @@
-DTC Bus Service Project
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DTC Bus Service System</title>
 
-This project simulates a bus service management system for the Delhi Transport Corporation (DTC) with two main components: an SQL database for managing the bus data and a Python application for interacting with it.
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
 
-Database Structure (SQL File)
-The SQL file defines the following tables:
-1.**staff**: Stores staff details including the bus number, driver, conductor, marshal, number of rounds per day, and timing.
-    * Relationships: Linked to the bus table via bus_no (foreign key).
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
 
-2.earnings_summary: Contains the daily earnings summary for each bus, including bus number, fare, rounds per day, average passengers, and daily earnings.
-3.customer_feedback: Allows customers to submit feedback and ratings for buses.
-  * Relationships: Linked to the bus table via bus_no (foreign key).
-4.bus: Stores details about each bus, such as its number, source, destination, route, stops, timing, and fare.
-5.admin: Holds admin login credentials (username and password).
+body {
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+    color: #fff;
+}
 
-Key Relationships:
-  Foreign Keys:
-  * staff and customer_feedback tables reference the bus table via bus_no.
-  * staff table also references the bus table with bus_no for mapping staff to         specific buses.
+/* Container */
+.container {
+    max-width: 1100px;
+    margin: auto;
+    padding: 20px;
+}
 
-Python Application Overview
-The Python code facilitates interactions between users, admins, and the database:
+/* Header */
+.header {
+    text-align: center;
+    padding: 50px 20px;
+}
 
-Libraries Used:
-* mysql.connector: For connecting to the MySQL database.
-* pandas: For handling and displaying data in tabular format.
-* matplotlib: For generating visual charts (e.g., bus fare comparison).
-* tabulate: For formatting and displaying data in a readable table format.
+.header h1 {
+    font-size: 3rem;
+    background: linear-gradient(90deg, #00c6ff, #0072ff);
+    -webkit-background-clip: text;
+    color: transparent;
+}
 
-Core Features:
-1.User Functions:
-  * View all buses.
-  * Search for buses by number, between two stops, or passing through a specific           stop.
-  * Add feedback with ratings for buses.
+.header p {
+    margin-top: 10px;
+    font-size: 1.1rem;
+    color: #ddd;
+}
 
-2.Admin Functions:
-* Login and authentication.
-* View all buses and staff.
-* Add, delete buses and staff.
-* View earnings summary and customer feedback.
-* Generate analytics charts (e.g., bus fare comparison).
+/* Card Layout */
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+    margin-top: 30px;
+}
 
-Functionality Flow:
-* User Panel:
+/* Card */
+.card {
+    background: rgba(255,255,255,0.08);
+    backdrop-filter: blur(10px);
+    border-radius: 15px;
+    padding: 20px;
+    transition: 0.3s;
+    border: 1px solid rgba(255,255,255,0.1);
+}
 
-    *Provides functionality for searching buses, viewing all buses, and submitting     feedback.
+.card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+}
 
-* Admin Panel:
+.card h2 {
+    color: #00c6ff;
+    margin-bottom: 10px;
+}
 
-     * Allows admins to manage buses, staff, view earnings summaries, and                 customer feedback, as well as generate charts for bus fares.
+.card ul {
+    padding-left: 20px;
+}
 
-* Menu System:
+.card li {
+    margin: 6px 0;
+}
 
-    *The system is interactive with a main menu that branches into user and admin       panels. The admin has more control, including the ability to add/delete buses       and view earnings/feedback data.
+/* Highlight Section */
+.highlight {
+    margin-top: 40px;
+    padding: 25px;
+    background: linear-gradient(135deg, #0072ff, #00c6ff);
+    border-radius: 15px;
+    text-align: center;
+}
 
-* How It Works:
+/* Code Box */
+.code {
+    background: #111;
+    padding: 12px;
+    border-radius: 8px;
+    margin-top: 10px;
+    font-family: monospace;
+    font-size: 0.9rem;
+    overflow-x: auto;
+}
 
-  * The Python code connects to a MySQL database (dtc_bus_service1).
+/* Footer */
+.footer {
+    text-align: center;
+    margin-top: 50px;
+    padding: 20px;
+    color: #bbb;
+}
+</style>
+</head>
 
-  * User and admin operations are executed via SQL queries (CRUD operations).
+<body>
 
-  * The admin has full access to manage buses, staff, earnings, and customer         feedback.
+<div class="container">
 
-  * The user can interact with the system by searching for buses, getting details,   and submitting feedback.
+    <!-- Header -->
+    <div class="header">
+        <h1>🚌 DTC Bus Service System</h1>
+        <p>Smart Bus Management using Python & MySQL</p>
+    </div>
 
-  * This project is a simple example of how to manage a bus service using SQL and     Python, integrating data management, user interaction, and data visualization.
+    <!-- Overview -->
+    <div class="grid">
+        <div class="card">
+            <h2>📌 Overview</h2>
+            <ul>
+                <li>Bus tracking & routes</li>
+                <li>Staff management</li>
+                <li>Earnings tracking</li>
+                <li>Customer feedback</li>
+                <li>Admin analytics</li>
+            </ul>
+        </div>
 
-Setup Instructions:
+        <div class="card">
+            <h2>🗂 Database</h2>
+            <ul>
+                <li>Bus details & routes</li>
+                <li>Staff assignments</li>
+                <li>Earnings summary</li>
+                <li>Feedback system</li>
+                <li>Admin login</li>
+            </ul>
+        </div>
 
-1.Import the SQL schema to your MySQL database.
+        <div class="card">
+            <h2>⚙ Features</h2>
+            <ul>
+                <li>User search system</li>
+                <li>Admin dashboard</li>
+                <li>CRUD operations</li>
+                <li>Data visualization</li>
+                <li>Secure login</li>
+            </ul>
+        </div>
+    </div>
 
-2.Install the required Python libraries:
+    <!-- User & Admin -->
+    <div class="grid">
+        <div class="card">
+            <h2>👤 User Panel</h2>
+            <ul>
+                <li>View buses</li>
+                <li>Search routes</li>
+                <li>Find stops</li>
+                <li>Submit feedback</li>
+            </ul>
+        </div>
 
-        pip install mysql-connector-python pandas matplotlib tabulate
+        <div class="card">
+            <h2>🔐 Admin Panel</h2>
+            <ul>
+                <li>Manage buses & staff</li>
+                <li>View earnings</li>
+                <li>Check feedback</li>
+                <li>Generate charts</li>
+            </ul>
+        </div>
 
+        <div class="card">
+            <h2>📊 Visualization</h2>
+            <ul>
+                <li>Fare comparison</li>
+                <li>Earnings insights</li>
+                <li>Graph analytics</li>
+            </ul>
+        </div>
+    </div>
 
-3.Run the Python script to start the application.
+    <!-- Flow -->
+    <div class="highlight">
+        <h2>🔄 System Flow</h2>
+        <p><b>User:</b> Search → View → Feedback</p>
+        <p><b>Admin:</b> Login → Manage → Analyze</p>
+    </div>
+
+    <!-- Setup -->
+    <div class="grid">
+        <div class="card">
+            <h2>🚀 Setup</h2>
+            <p>1. Import SQL file</p>
+            <p>2. Install dependencies</p>
+            <div class="code">
+                pip install mysql-connector-python pandas matplotlib tabulate
+            </div>
+            <p>3. Run project</p>
+            <div class="code">
+                python main.py
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>📁 Structure</h2>
+            <div class="code">
+DTC-Bus-Service/
+├── database.sql
+├── main.py
+├── requirements.txt
+└── README.html
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>💡 Future Scope</h2>
+            <ul>
+                <li>Web App (React/Flask)</li>
+                <li>Live tracking</li>
+                <li>Booking system</li>
+                <li>Mobile app</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        <p>👨‍💻 Developed by <b>Sandeep semwal</b> | IT Project</p>
+    </div>
+
+</div>
+
+</body>
+</html>
