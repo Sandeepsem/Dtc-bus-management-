@@ -11,7 +11,10 @@
 </p>
 
 ---
-
+<img src="Dashboard images/Election_2024_Darshboard_page-0001.jpg" 
+     width="280" 
+     style="border-radius:10px; transform: rotate(90deg); display:block; margin:auto;">
+---     
 ## 📌 Overview
 
 ✨ This project simulates a real-world **Delhi Bus Service System** with:
