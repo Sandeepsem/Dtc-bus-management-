@@ -8,7 +8,7 @@ def connect_db():
     return mysql.connector.connect( 
         host="localhost", 
         user="root", 
-        password="", 
+        password="12345", 
         database="dtc_bus_service1" 
     ) 
  
@@ -17,10 +17,9 @@ def show_dataframe(rows, columns, title):
     if not rows: 
         print(f"\nNo records found for {title}.\n") 
         return 
-    print(f"\n========== {title.upper()} ==========\n") 
+    print(f"\n====== {title.upper().center(70)} ======\n") 
     df = pd.DataFrame(rows, columns=columns) 
-    print(tabulate(df, headers="keys", tablefmt="grid", numalign="center", stralign="center", 
-showindex=False)) 
+    print(tabulate(df, headers="keys", tablefmt="grid", numalign="left", stralign="left",showindex=False)) 
     print("\n") 
  
 # ================= USER PANEL FUNCTIONS ================= 
@@ -30,8 +29,7 @@ def user_view_all_buses():
     cur.execute("SELECT * FROM bus") 
     rows = cur.fetchall() 
     db.close() 
-    show_dataframe(rows, ["Bus No", "Source", "Destination", "Route", "Stops", "Time (mins)", 
-"Fare (₹)"], "All Buses") 
+    show_dataframe(rows, ["Bus No", "Source", "Destination", "Route", "Stops", "Time (mins)","Fare (₹)"], "All Buses") 
  
 def user_search_bus_by_number(): 
     bus_no = input("Enter Bus Number: ").upper() 
@@ -40,8 +38,7 @@ def user_search_bus_by_number():
     cur.execute("SELECT * FROM bus WHERE bus_no=%s", (bus_no,)) 
     rows = cur.fetchall() 
     db.close() 
-    show_dataframe(rows, ["Bus No", "Source", "Destination", "Route", "Stops", "Time (mins)", 
-"Fare (₹)"], f"Bus {bus_no}") 
+    show_dataframe(rows, ["Bus No", "Source", "Destination", "Route", "Stops", "Time (mins)","Fare (₹)"], f"Bus {bus_no}") 
  
 def user_search_between_stops(): 
     start = input("Enter starting stop: ").strip().lower() 
@@ -51,8 +48,7 @@ def user_search_between_stops():
     cur.execute("SELECT * FROM bus") 
     rows = [r for r in cur.fetchall() if start in r[4].lower() and end in r[4].lower()] 
     db.close() 
-    show_dataframe(rows, ["Bus No", "Source", "Destination", "Route", "Stops", "Time", "Fare"], 
-f"Buses between {start} and {end}") 
+    show_dataframe(rows, ["Bus No", "Source", "Destination", "Route", "Stops", "Time", "Fare"],f"Buses between {start} and {end}") 
  
 def user_search_passing_stop(): 
     stop = input("Enter stop name: ").strip().lower() 
@@ -61,19 +57,24 @@ def user_search_passing_stop():
     cur.execute("SELECT * FROM bus") 
     rows = [r for r in cur.fetchall() if stop in r[4].lower()] 
     db.close() 
-    show_dataframe(rows, ["Bus No", "Source", "Destination", "Route", "Stops", "Time", "Fare"], 
-f"Buses passing through {stop}") 
+    show_dataframe(rows, ["Bus No", "Source", "Destination", "Route", "Stops", "Time", "Fare"],f"Buses passing through {stop}") 
  
-def user_add_feedback(): 
-    bus_no = input("Enter Bus Number: ").upper() 
-    rating = int(input("Enter Rating (1–5): ")) 
-    feedback = input("Enter Feedback: ") 
-    db = connect_db() 
-    cur = db.cursor() 
-    cur.execute("INSERT INTO customer_feedback (bus_no, rating, feedback) VALUES (%s, %s, %s), (bus_no, rating, feedback)") 
-    db.commit() 
-    db.close() 
-    print("✅Thank you! Feedback submitted successfully.\n") 
+def user_add_feedback():
+    db = connect_db()
+    cur = db.cursor()
+    bus_no = input("Enter Bus Number: ").upper()
+    rating = int(input("Rate Your Experience (1 - 5): "))
+    feedback = input("Enter Your Feedback: ")
+    
+    
+    cur.execute(
+        "INSERT INTO customer_feedback (bus_no, rating, feedback) VALUES (%s, %s, %s)",(bus_no, rating, feedback)
+    )
+    
+    db.commit()
+    print("Thank you for your feedback!")
+    db.close()
+
  
 # ================= ADMIN PANEL FUNCTIONS ================= 
 def admin_login(): 
@@ -81,8 +82,7 @@ def admin_login():
     password = input("Enter Admin Password: ") 
     db = connect_db() 
     cur = db.cursor() 
-    cur.execute("SELECT * FROM admin WHERE username=%s AND password=%s", 
-(username, password)) 
+    cur.execute("SELECT * FROM admin WHERE username=%s AND password=%s",(username, password)) 
     if cur.fetchone(): 
         print("\n✅ Login successful!\n") 
         admin_menu() 
@@ -93,14 +93,30 @@ def admin_login():
 def admin_view_all_buses(): 
     user_view_all_buses() 
  
-def admin_add_bus(): 
-    data = input("Enter bus_no, source, destination, route, stops, time, fare (comma-separated):").split(',') 
-    db = connect_db() 
-    cur = db.cursor() 
-    cur.execute("INSERT INTO bus VALUES (%s,%s,%s,%s,%s,%s,%s)", tuple(map(str.strip,data))) 
-    db.commit() 
-    db.close() 
-    print(" ✅ Bus added successfully.\n") 
+def admin_add_bus():
+    data = input("Enter bus_no, source, destination, route, stops, time, fare (comma-separated): ").split(',')
+    db = connect_db()
+    cur = db.cursor()
+    
+    data = tuple(map(str.strip, data)) 
+    
+    if len(data) == 7:
+        cur.execute("INSERT INTO bus VALUES (%s,%s,%s,%s,%s,%s,%s)", data)
+    elif len(data) == 9:
+        cur.execute("INSERT INTO bus VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)", data)
+    elif len(data) == 10:
+        cur.execute("INSERT INTO bus VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)", data)
+    elif len(data) == 11:
+        cur.execute("INSERT INTO bus VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)", data)    
+    else:
+        print(f"❌ Error: Expected 7 or 9 values, got {len(data)}.")
+        db.close()
+        return
+    
+    db.commit()
+    db.close()
+    print("✅ Bus added successfully.\n")
+
  
 def admin_delete_bus(): 
     bus_no = input("Enter Bus Number to delete: ").upper() 
@@ -128,23 +144,51 @@ def admin_add_staff():
     db.close() 
     print(" ✅ Staff added successfully.\n") 
  
-def admin_view_earnings(): 
-    db = connect_db() 
-    cur = db.cursor() 
-    cur.execute("SELECT bus_no, fare, stops FROM bus") 
-    bus_data = cur.fetchall() 
-    cur.execute("SELECT bus_no, rounds_per_day FROM staff") 
-    staff_data = dict(cur.fetchall()) 
-    db.close() 
- 
-    avg_passengers = 30 
-    earnings = [] 
-    for bus_no, fare, stops in bus_data: 
-        rounds = staff_data.get(bus_no, 1) 
-        total = fare * (len(stops.split(','))) * avg_passengers * rounds 
-        earnings.append((bus_no, fare, rounds, avg_passengers, total)) 
-    show_dataframe(earnings, ["Bus No", "Fare (₹)", "Rounds/Day", "Avg Passengers", "Daily Earning (₹)"], "Automatic Earnings Summary") 
- 
+def admin_view_earnings():
+    db = connect_db()
+    cur = db.cursor()
+
+    
+    cur.execute("SELECT bus_no, fare, stops FROM bus")
+    bus_data = cur.fetchall()
+
+    cur.execute("SELECT bus_no, rounds_per_day FROM staff")
+    staff_data = dict(cur.fetchall())
+
+
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS earnings_summary (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            bus_no VARCHAR(20),
+            fare DECIMAL(10,2),
+            rounds_per_day INT,
+            avg_passengers INT,
+            daily_earning DECIMAL(15,2),
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    """)
+
+    avg_passengers = 30
+    earnings = []
+
+    for bus_no, fare, stops in bus_data:
+        rounds = staff_data.get(bus_no, 1)
+        stop_count = len((stops or "").split(",")) 
+        total = float(fare) * stop_count * avg_passengers * rounds
+
+        earnings.append((bus_no, fare, rounds, avg_passengers, total))
+
+        cur.execute("""
+            INSERT INTO earnings_summary (bus_no, fare, rounds_per_day, avg_passengers, daily_earning) VALUES (%s, %s, %s, %s, %s)""", (bus_no, fare, rounds, avg_passengers, total))
+
+    db.commit()
+    db.close()
+
+    show_dataframe(
+        earnings,
+        ["Bus No", "Fare (₹)", "Rounds/Day", "Avg Passengers", "Daily Earning (₹)"],"Automatic Earnings Summary"
+    )
+    
 def admin_view_feedback(): 
     db = connect_db() 
     cur = db.cursor() 
@@ -154,16 +198,111 @@ def admin_view_feedback():
     show_dataframe(rows, ["Bus No", "Rating (/5)", "Feedback"], "Customer Feedback") 
  
 def admin_charts(): 
-    db = connect_db() 
-    cur = db.cursor() 
-    cur.execute("SELECT bus_no, fare FROM bus") 
-    df = pd.DataFrame(cur.fetchall(), columns=["Bus No", "Fare (₹)"]) 
-    plt.bar(df["Bus No"], df["Fare (₹)"]) 
-    plt.title("Bus Fare Comparison") 
-    plt.xlabel("Bus No") 
-    plt.ylabel("Fare (₹)") 
-    plt.show() 
-    db.close() 
+   # db = connect_db() 
+    #cur = db.cursor() 
+    #cur.execute("SELECT bus_no, fare FROM bus") 
+    #df = pd.DataFrame(cur.fetchall(), columns=["Bus No", "Fare (₹)"]) 
+    #plt.bar(df["Bus No"], df["Fare (₹)"]) 
+    #plt.title("Bus Fare Comparison") 
+    #plt.xlabel("Bus No") 
+    #plt.ylabel("Fare (₹)") 
+    #plt.show() 
+    #db.close() 
+
+    while True:
+        print("\n📊 ==== ADMIN CHART MENU ====")
+        print("1. Bus Fare Comparison")
+        print("2. Travel Time per Bus")
+        print("3. Stops vs Fare Chart")
+        print("4. Earnings Chart")
+        print("5. Customer Satisfaction Chart")
+        print("6. Number of Rounds Chart")
+        print("7. Back to Admin Menu")
+        choice = input("Enter your choice: ")
+
+        if choice == '1':
+            db = connect_db() 
+            cursor = db.cursor() 
+            cursor.execute("SELECT bus_no, fare FROM bus")
+            data = cursor.fetchall()
+            df = pd.DataFrame(data, columns=["Bus No", "Fare (₹)"])
+            plt.bar(df["Bus No"], df["Fare (₹)"])
+            plt.title("Bus Fare Comparison")
+            plt.xlabel("Bus No")
+            plt.ylabel("Fare (₹)")
+            plt.show()
+            db.close()
+
+        elif choice == '2':
+            db = connect_db() 
+            cursor = db.cursor()
+            cursor.execute("SELECT bus_no, time FROM bus")
+            data = cursor.fetchall()
+            df = pd.DataFrame(data, columns=["Bus No", "Time (mins)"])
+            plt.bar(df["Bus No"], df["Time (mins)"])
+            plt.title("Travel Time per Bus")
+            plt.xlabel("Bus No")
+            plt.ylabel("Time (mins)")
+            plt.show()
+            db.close()
+
+        elif choice == '3':
+            db = connect_db() 
+            cursor = db.cursor()
+            cursor.execute("SELECT stops, fare FROM bus")
+            data = cursor.fetchall()
+            df = pd.DataFrame(data, columns=["Stops", "Fare (₹)"])
+            plt.scatter(df["Stops"], df["Fare (₹)"])
+            plt.title("Stops vs Fare")
+            plt.xlabel("Number of Stops")
+            plt.ylabel("Fare (₹)")
+            plt.show()
+            db.close()
+
+        elif choice == '4':
+            db = connect_db() 
+            cursor = db.cursor()
+            cursor.execute("SELECT bus_no, daily_earning FROM earnings_summary")
+            data = cursor.fetchall()
+            df = pd.DataFrame(data, columns=["Bus No", "Total Earnings (₹)"])
+            plt.bar(df["Bus No"], df["Total Earnings (₹)"])
+            plt.title("Bus Earnings Comparison")
+            plt.xlabel("Bus No")
+            plt.ylabel("Earnings (₹)")
+            plt.show()
+            db.close()
+
+        elif choice == '5':
+            db = connect_db() 
+            cursor = db.cursor()
+            cursor.execute("SELECT bus_no, rating FROM customer_feedback")
+            data = cursor.fetchall()
+            df = pd.DataFrame(data, columns=["Bus No", "Rating (/5)"])
+            plt.bar(df["Bus No"], df["Rating (/5)"])
+            plt.title("Customer Satisfaction Chart")
+            plt.xlabel("Bus No")
+            plt.ylabel("Average Rating (/5)")
+            plt.show()
+            db.close()
+
+        elif choice == '6':
+            db = connect_db() 
+            cursor = db.cursor()
+            cursor.execute("SELECT bus_no, rounds_per_day FROM staff")
+            data = cursor.fetchall()
+            df = pd.DataFrame(data, columns=["Bus No", "Rounds/Day"])
+            plt.bar(df["Bus No"], df["Rounds/Day"])
+            plt.title("Number of Rounds per Day")
+            plt.xlabel("Bus No")
+            plt.ylabel("Rounds/Day")
+            plt.show()
+            db.close()
+
+        elif choice == '7':
+            break
+
+        else:
+            print("Invalid choice! Please try again.")
  
 # ================= MENU STRUCTURE ================= 
 def user_menu(): 
@@ -209,7 +348,7 @@ def admin_menu():
         else: print("Invalid choice!") 
  
 def main(): 
-    print("\n 🚍 Welcome to Delhi Transport Corporation (DTC) System�� ") 
+    print("\n Welcome to Delhi Transport Corporation (DTC) System ") 
     while True: 
         print("\n===== MAIN MENU =====") 
         print("1. User Panel") 
